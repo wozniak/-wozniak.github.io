@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>hex guessing game</title>
+        <style>
+            .centered {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                /* bring your own prefixes */
+                transform: translate(-50%, -50%);
+            }
+            input[type=text] {
+                padding: 0;
+                height: 24pt;
+                font-size: 24pt;
+                font-family: monospace;
+                text-align: center;
+                border: 1px;
+                background: none;
+            }
+            input[type=text]:focus {
+                outline-width: 0;
+            }
+            body {
+                font-family: monospace;   
+            }
+            #preview {
+                font-size: 36pt;
+            }
+            #response {
+                margin-bottom: 5px;
+            }
+        </style>
+        <script defer>
+            var box;
+            var body;
+            var color;
+            var form;
+            var response;
+            var hexcolor;
+            var preview;
+
+            function filterInput(e) {
+                let t = e.target;
+                
+            }
+
+            function hexToRgb(hex) {
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+
+            function submit(e) {
+                let c = hexToRgb(box.value);
+                if (c == null) {
+                    response.innerText = "invalid color!";
+                    e.preventDefault();
+                    return;
+                }
+                response.innerText = `% error\nr: ${((c.r-color.r)/color.r*100).toFixed(1)}% g: ${((c.g-color.g)/color.g*100).toFixed(1)}% b: ${((c.b-color.b)/color.b*100).toFixed(1)}%\nactual color: ${hexcolor}\nyour guess:`;
+                preview.style.color = "#" + box.value;
+                preview.style.display = "inline";
+                newcolor.style.display = "block";
+                // box.value = "";
+                e.preventDefault();
+            }
+
+            function newColor() {
+                num = Math.floor(Math.random()*16777215);
+                if (num > 8388607) {
+                    box.style.color = "#000000";
+                    response.style.color = "#000000"
+                } else {
+                    box.style.color = "#ffffff"
+                    response.style.color = "#ffffff"
+                }
+                hexcolor = num.toString(16).padStart(6, "0");
+                body.style.background = "#" + hexcolor;
+                box.value = "";
+                response.innerText = "";
+                preview.style.color = "#" + hexcolor;
+                preview.style.display = "none";
+                color = hexToRgb(hexcolor);
+                newcolor.style.display = "none";
+                box.focus();
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                box = document.getElementById("color");
+                body = document.getElementById("page");
+                form = document.getElementById("form");
+                response = document.getElementById("response");
+                preview = document.getElementById("preview");
+                newcolor = document.getElementById("newcolor");
+
+                box.addEventListener("input", filterInput);
+                form.onsubmit = submit;
+
+                newColor();
+            }, false);
+        </script>
+    </head>
+    <body id="page">
+        <div class="centered">
+            <form id="form" onsubmit="submit()">
+                <input name="color" type="text" id="color" autocomplete="off" autofocus>
+            </form>
+            <p id="response"></p>
+            <div id="preview">&#9632;&#9632;&#9632;</div><br>
+            <a id="newcolor" onclick="newColor()" href="javascript:void(0);">new color</a>
+        </div>
+    </body>
+</html>
